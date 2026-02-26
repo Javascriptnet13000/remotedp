@@ -24,8 +24,10 @@ jobs:
           Start-Process -FilePath tailscale.exe -ArgumentList "/S" -Wait
 
       - name: Connect to Tailscale
+        env:
+          TAILSCALE_AUTHKEY: ${{ secrets.TAILSCALE_AUTHKEY }}
         run: |
-          & "C:\Program Files\Tailscale\tailscale.exe" up --authkey=${{ secrets.TAILSCALE_AUTHKEY }}
+          & "C:\Program Files\Tailscale\tailscale.exe" up --authkey="$env:TAILSCALE_AUTHKEY" --accept-routes
           & "C:\Program Files\Tailscale\tailscale.exe" ip
 
       - name: Keep Alive
