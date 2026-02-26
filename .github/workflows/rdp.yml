@@ -18,13 +18,14 @@ jobs:
           Add-LocalGroupMember -Group "Administrators" -Member "rdpuser"
           Add-LocalGroupMember -Group "Remote Desktop Users" -Member "rdpuser"
 
-      - name: Connect to Tailscale
-        uses: tailscale/github-action@v2
-        with:
-          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
-
-      - name: Show Tailscale IP
-        run: tailscale ip
+      - name: Install and Connect Tailscale
+        run: |
+          $authkey = "${{ secrets.TAILSCALE_AUTHKEY }}"
+          Invoke-WebRequest -Uri "https://pkgs.tailscale.com/stable/tailscale-setup-latest.exe" -OutFile tailscale.exe
+          Start-Process -FilePath tailscale.exe -ArgumentList "/S" -Wait
+          Start-Sleep -Seconds 5
+          & "C:\Program Files\Tailscale\tailscale.exe" up --authkey=$authkey
+          & "C:\Program Files\Tailscale\tailscale.exe" ip
 
       - name: Keep Alive
         run: Start-Sleep -Seconds 21600
